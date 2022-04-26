@@ -1,89 +1,90 @@
 //
-//  TelaInicialTableViewController.swift
+//  ListaDeTarefasTableViewController.swift
 //  ListaDeTarefas
 //
-//  Created by Angélica Andrade de Meira on 25/04/22.
+//  Created by Angélica Andrade de Meira on 26/04/22.
 //
 
 import UIKit
 import CoreData
 
-class TelaInicialTableViewController: UITableViewController {
+class ListaDeTarefasTableViewController: UITableViewController {
     
-    var contexto: NSManagedObjectContext?
-    var listaDeListas: [NSManagedObject] = []
     var listaSelecionada: NSManagedObject?
+    var tarefaSelecionada: NSManagedObject?
+    var contexto: NSManagedObjectContext?
+    var listaDeTarefas: [NSManagedObject] = []
     
     // MARK: - View code
     
-    private lazy var botaoAdicionarLista: UIBarButtonItem = {
+    private lazy var botaoAdicionarTarefa: UIBarButtonItem = {
         let view = UIBarButtonItem()
-        view.title = "Nova Lista"
+        view.title = "Nova Tarefa"
         view.target = self
-        view.action = #selector(vaiParaAdicionarLista)
+        view.action = #selector(vaiParaAdicionarTarefa)
         return view
       }()
     
-    @objc func vaiParaAdicionarLista() {
-        self.present(UINavigationController(rootViewController: AdicionaListaViewController()), animated: true)
+    @objc func vaiParaAdicionarTarefa() {
+        self.present(UINavigationController(rootViewController: AdicionaTarefaViewController()), animated: true)
     }
     
     override func loadView() {
         super.loadView()
-        self.navigationItem.title = "Minhas listas"
-        self.navigationItem.rightBarButtonItems = [botaoAdicionarLista]
+        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as! String)
+        self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasListas")
+
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasTarefas")
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         contexto = appDelegate.persistentContainer.viewContext
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        recuperaListas()
+        recuperaTarefas()
     }
     
-    func recuperaListas() {
+    func recuperaTarefas() {
         
-        let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Lista")
+        let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
         requisicao.sortDescriptors = [ordenacao]
         
         do {
             
             if let contexto = contexto {
-                let listasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeListas = listasRecuperadas as! [NSManagedObject]
+                let tarefasRecuperadas = try contexto.fetch(requisicao)
+                self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
                 tableView.reloadData()
             }else{
                 return
             }
         } catch let erro {
-            print("Erro ao carregar listas:" + erro.localizedDescription)
+            print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
     }
     
-    func removeLista(indexPath: IndexPath){
+    func removeTarefa(indexPath: IndexPath){
         
-        let lista = self.listaDeListas[indexPath.row]
+        let tarefa = self.listaDeTarefas[indexPath.row]
         
         if let contexto = self.contexto{
-            contexto.delete(lista)
-            self.listaDeListas.remove(at: indexPath.row)
+            contexto.delete(tarefa)
+            self.listaDeTarefas.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .automatic)
             
             do {
                 try contexto.save()
             } catch let erro  {
-                print("Erro ao remover lista:" + erro.localizedDescription)
+                print("Erro ao remover tarefa:" + erro.localizedDescription)
             }
         }
     }
-    
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -91,26 +92,22 @@ class TelaInicialTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listaDeListas.count
+        return listaDeTarefas.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
+        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
 
-        let dadosLista = self.listaDeListas[indexPath.row]
+        let dadosTarefa = self.listaDeTarefas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
+        celula.textLabel?.text = (dadosTarefa.value(forKey: "descricao") as! String)
 
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        self.listaSelecionada = self.listaDeListas[indexPath.row]
-        let viewDestino = ListaDeTarefasTableViewController()
-        viewDestino.listaSelecionada = self.listaSelecionada
-        self.navigationController?.pushViewController(viewDestino, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -118,22 +115,18 @@ class TelaInicialTableViewController: UITableViewController {
             
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
-                self.removeLista(indexPath: indexPath)
+                self.removeTarefa(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
                 let indice = indexPath.row
-                self.listaSelecionada = self.listaDeListas[indice]
-                let viewDeDestino = AdicionaListaViewController()
-                viewDeDestino.listaSelecionada = self.listaSelecionada
+                self.tarefaSelecionada = self.listaDeTarefas[indice]
+                let viewDeDestino = AdicionaTarefaViewController()
+                viewDeDestino.tarefaSelecionada = self.tarefaSelecionada
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
             })
         ]
         return UISwipeActionsConfiguration(actions: acoes)
     }
-}
-
-protocol TelaInicialTableViewControllerDelegate: AnyObject {
-    func chamaRecuperaListas()
 }
