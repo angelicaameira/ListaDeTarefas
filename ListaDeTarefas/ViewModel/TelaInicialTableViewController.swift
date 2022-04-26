@@ -11,7 +11,7 @@ import CoreData
 class TelaInicialTableViewController: UITableViewController {
     
     var contexto: NSManagedObjectContext?
-    var listaDeListas: [NSManagedObject] = []
+    var listaDeListas: [NSManagedObject]? = []
     var listaSelecionada: NSManagedObject?
     
     // MARK: - View code
@@ -48,7 +48,6 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func recuperaListas() {
-        
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Lista")
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
         requisicao.sortDescriptors = [ordenacao]
@@ -57,9 +56,9 @@ class TelaInicialTableViewController: UITableViewController {
             
             if let contexto = contexto {
                 let listasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeListas = listasRecuperadas as! [NSManagedObject]
+                self.listaDeListas = listasRecuperadas as? [NSManagedObject]
                 tableView.reloadData()
-            }else{
+            } else {
                 return
             }
         } catch let erro {
@@ -67,18 +66,17 @@ class TelaInicialTableViewController: UITableViewController {
         }
     }
     
-    func removeLista(indexPath: IndexPath){
+    func removeLista(indexPath: IndexPath) {
         
-        let lista = self.listaDeListas[indexPath.row]
-        
-        if let contexto = self.contexto{
+        if let lista = self.listaDeListas?[indexPath.row],
+        let contexto = self.contexto {
             contexto.delete(lista)
-            self.listaDeListas.remove(at: indexPath.row)
+            self.listaDeListas?.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .automatic)
             
             do {
                 try contexto.save()
-            } catch let erro  {
+            } catch let erro {
                 print("Erro ao remover lista:" + erro.localizedDescription)
             }
         }
@@ -91,16 +89,16 @@ class TelaInicialTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listaDeListas.count
+        return listaDeListas?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
 
-        let dadosLista = self.listaDeListas[indexPath.row]
+        let dadosLista = self.listaDeListas?[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
+        celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
 
         return celula
     }
@@ -111,7 +109,6 @@ class TelaInicialTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
-            
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
                 self.removeLista(indexPath: indexPath)
@@ -120,7 +117,7 @@ class TelaInicialTableViewController: UITableViewController {
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
                 let indice = indexPath.row
-                self.listaSelecionada = self.listaDeListas[indice]
+                self.listaSelecionada = self.listaDeListas?[indice]
                 let viewDeDestino = AdicionaListaViewController()
                 viewDeDestino.listaSelecionada = self.listaSelecionada
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)

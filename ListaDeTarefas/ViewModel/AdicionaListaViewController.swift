@@ -63,11 +63,8 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         setup()
 
         campoDescricao.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 60).isActive = true
-        
         campoDescricao.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).isActive = true
-        
         campoDescricao.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20).isActive = true
-        
         campoDescricao.delegate = self
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -76,7 +73,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
     
     @objc func ok() {
         
-        if listaSelecionada == nil{
+        if listaSelecionada == nil {
             salvarNovaLista()
         } else {
             atualizarNomeDaLista()
@@ -97,30 +94,29 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         
         do {
             try contexto.save()
-        } catch let erro  {
+        } catch let erro {
             print("Erro ao salvar lista:" + erro.localizedDescription)
         }
     }
     
-    func atualizarNomeDaLista(){
+    func atualizarNomeDaLista() {
         
-        if let lista = self.listaSelecionada{
+        if let lista = self.listaSelecionada {
             lista.setValue(self.campoDescricao.text, forKey: "descricao")
             
             do {
                 try contexto.save()
-            } catch let erro  {
+            } catch let erro {
                 print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
             }
-        }
-        else {
+        } else {
             return
         }
     }
     
     func setup() {
-        if let lista = self.listaSelecionada{
-            campoDescricao.text = ((lista.value(forKey: "descricao")) as! String)
+        if let lista = self.listaSelecionada {
+            campoDescricao.text = lista.value(forKey: "descricao") as? String
         }
     }
     
