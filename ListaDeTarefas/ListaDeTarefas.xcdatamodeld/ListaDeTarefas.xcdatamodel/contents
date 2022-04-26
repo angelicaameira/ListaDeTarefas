@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Lista" representedClassName="Lista" syncable="YES" codeGenerationType="class">
+        <attribute name="codigo" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="descricao" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Tarefa" representedClassName="Tarefa" syncable="YES" codeGenerationType="class">
+        <attribute name="cod_lista" optional="YES" attributeType="String"/>
+        <attribute name="codigo" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="descricao" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="Lista" positionX="-63" positionY="-18" width="128" height="59"/>
+        <element name="Tarefa" positionX="-54" positionY="9" width="128" height="74"/>
+    </elements>
 </model>
