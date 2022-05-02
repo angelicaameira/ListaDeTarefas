@@ -12,6 +12,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
     
     var tarefaSelecionada: NSManagedObject?
     var contexto: NSManagedObjectContext!
+    var listaSelecionada: NSManagedObject?
     
     // MARK: - View code
     
@@ -20,14 +21,14 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         view.title = "Ok"
         view.action = #selector(ok)
         return view
-      }()
+    }()
     
     private lazy var botaoCancelar: UIBarButtonItem = {
         let view = UIBarButtonItem()
         view.title = "Cancelar"
         view.action = #selector(cancelar)
         return view
-      }()
+    }()
     
     private lazy var campoDescricao: UITextField = {
         let view = UITextField()
@@ -37,7 +38,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         view.returnKeyType = .done
         view.becomeFirstResponder()
         return view
-      }()
+    }()
     
     private lazy var campoDetalhes: UITextField = {
         let view = UITextField()
@@ -46,7 +47,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         view.placeholder = "Insira os detalhes da tarefa"
         view.returnKeyType = .done
         return view
-      }()
+    }()
     
     override func loadView() {
         super.loadView()
@@ -63,32 +64,26 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
             self.title = "Nova tarefa"
         }
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-
+        
         campoDescricao.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 60).isActive = true
-        
         campoDescricao.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).isActive = true
-        
         campoDescricao.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20).isActive = true
-        
         campoDetalhes.topAnchor.constraint(equalTo: self.campoDescricao.bottomAnchor, constant: 10).isActive = true
-        
         campoDetalhes.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).isActive = true
-        
         campoDetalhes.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20).isActive = true
         
         campoDescricao.delegate = self
         campoDetalhes.delegate = self
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
     @objc func ok() {
-        
         if tarefaSelecionada == nil{
             salvarNovaTarefa()
         } else {
@@ -102,20 +97,21 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
     }
     
     func salvarNovaTarefa(){
-        let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
-        
-        novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
-        novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
-        
-        do {
-            try contexto.save()
-        } catch let erro  {
-            print("Erro ao salvar tarefa:" + erro.localizedDescription)
+        if let lista = listaSelecionada {
+            let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
+            novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
+            novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+            novaTarefa.setValue(lista, forKey: "lista")
+            
+            do {
+                try contexto.save()
+            } catch let erro {
+                print("Erro ao salvar tarefa:" + erro.localizedDescription)
+            }
         }
     }
     
     func atualizarTarefa(){
-        
         if let tarefa = self.tarefaSelecionada{
             tarefa.setValue(self.campoDescricao.text, forKey: "descricao")
             tarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")

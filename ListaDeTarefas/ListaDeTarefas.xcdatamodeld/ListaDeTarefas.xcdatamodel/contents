@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Lista" representedClassName="Lista" syncable="YES" codeGenerationType="class">
-        <attribute name="codigo" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="checkbox" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="descricao" optional="YES" attributeType="String"/>
-        <relationship name="lista_tarefa" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tarefa" inverseName="tarefa_lista" inverseEntity="Tarefa"/>
+        <relationship name="tarefas" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tarefa" inverseName="lista" inverseEntity="Tarefa"/>
     </entity>
     <entity name="Tarefa" representedClassName="Tarefa" syncable="YES" codeGenerationType="class">
-        <attribute name="cod_lista" optional="YES" attributeType="String"/>
-        <attribute name="codigo" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="checkbox" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="descricao" optional="YES" attributeType="String"/>
         <attribute name="detalhes" optional="YES" attributeType="String"/>
-        <relationship name="tarefa_lista" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Lista" inverseName="lista_tarefa" inverseEntity="Lista"/>
+        <relationship name="lista" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Lista" inverseName="tarefas" inverseEntity="Lista"/>
     </entity>
     <elements>
-        <element name="Tarefa" positionX="187.875" positionY="-117.25" width="128" height="118"/>
-        <element name="Lista" positionX="-8.66796875" positionY="-102.234375" width="128" height="88"/>
+        <element name="Lista" positionX="-8.66796875" positionY="-102.234375" width="128" height="74"/>
+        <element name="Tarefa" positionX="187.875" positionY="-117.25" width="128" height="89"/>
     </elements>
 </model>

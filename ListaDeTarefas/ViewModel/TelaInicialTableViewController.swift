@@ -22,7 +22,7 @@ class TelaInicialTableViewController: UITableViewController {
         view.target = self
         view.action = #selector(vaiParaAdicionarLista)
         return view
-      }()
+    }()
     
     @objc func vaiParaAdicionarLista() {
         self.present(UINavigationController(rootViewController: AdicionaListaViewController()), animated: true)
@@ -33,12 +33,13 @@ class TelaInicialTableViewController: UITableViewController {
         self.navigationItem.title = "Minhas listas"
         self.navigationItem.rightBarButtonItems = [botaoAdicionarLista]
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasListas")
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -48,7 +49,6 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func recuperaListas() {
-        
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Lista")
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
         requisicao.sortDescriptors = [ordenacao]
@@ -68,7 +68,6 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func removeLista(indexPath: IndexPath){
-        
         let lista = self.listaDeListas[indexPath.row]
         
         if let contexto = self.contexto{
@@ -85,23 +84,22 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return listaDeListas.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
-
         let dadosLista = self.listaDeListas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
-
+        
         return celula
     }
     
@@ -115,7 +113,6 @@ class TelaInicialTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
-            
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
                 self.removeLista(indexPath: indexPath)

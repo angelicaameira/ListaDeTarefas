@@ -23,23 +23,27 @@ class ListaDeTarefasTableViewController: UITableViewController {
         view.target = self
         view.action = #selector(vaiParaAdicionarTarefa)
         return view
-      }()
+    }()
     
     @objc func vaiParaAdicionarTarefa() {
-        self.present(UINavigationController(rootViewController: AdicionaTarefaViewController()), animated: true)
+        let viewDeDestino = AdicionaTarefaViewController()
+        viewDeDestino.listaSelecionada = self.listaSelecionada
+        self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
     }
     
     override func loadView() {
         super.loadView()
+        
         self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as! String)
         self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasTarefas")
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -49,13 +53,14 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     func recuperaTarefas() {
-        
+        guard let lista = listaSelecionada
+        else { return }
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
+        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            
             if let contexto = contexto {
                 let tarefasRecuperadas = try contexto.fetch(requisicao)
                 self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
@@ -69,7 +74,6 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     func removeTarefa(indexPath: IndexPath){
-        
         let tarefa = self.listaDeTarefas[indexPath.row]
         
         if let contexto = self.contexto{
@@ -84,35 +88,37 @@ class ListaDeTarefasTableViewController: UITableViewController {
             }
         }
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return listaDeTarefas.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
-
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
-        
+        guard ((celula.textLabel?.text = (dadosTarefa.value(forKey: "descricao") as? String)) != nil) else { return celula }
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = (dadosTarefa.value(forKey: "descricao") as! String)
-
+        
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        } else {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .disclosureIndicator
+        }
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
-            
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
                 guard let self = self else { return }
                 self.removeTarefa(indexPath: indexPath)
@@ -124,6 +130,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
                 self.tarefaSelecionada = self.listaDeTarefas[indice]
                 let viewDeDestino = AdicionaTarefaViewController()
                 viewDeDestino.tarefaSelecionada = self.tarefaSelecionada
+                viewDeDestino.listaSelecionada = self.listaSelecionada
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
             })
         ]
