@@ -101,6 +101,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
             let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
             novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
             novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+            novaTarefa.setValue(false, forKey: "checkbox")
             novaTarefa.setValue(lista, forKey: "lista")
             
             do {

@@ -12,7 +12,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     
     var listaSelecionada: NSManagedObject?
     var tarefaSelecionada: NSManagedObject?
-    var contexto: NSManagedObjectContext?
+    var contexto: NSManagedObjectContext!
     var listaDeTarefas: [NSManagedObject] = []
     
     // MARK: - View code
@@ -65,7 +65,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
                 let tarefasRecuperadas = try contexto.fetch(requisicao)
                 self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
                 tableView.reloadData()
-            }else{
+            } else {
                 return
             }
         } catch let erro {
@@ -100,20 +100,40 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
-        guard ((celula.textLabel?.text = (dadosTarefa.value(forKey: "descricao") as? String)) != nil) else { return celula }
-        celula.accessoryType = .disclosureIndicator
+        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
+        let descricao = dadosTarefa.value(forKey: "descricao") as? String
+        celula.textLabel?.text = descricao
+        let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
+        
+        if checkbox == true {
+            celula.accessoryType = .checkmark
+        } else {
+            celula.accessoryType = .none
+        }
         
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
+        if let tarefa = self.tarefaSelecionada{
+            if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none {
+                tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+                tarefa.setValue(true, forKey: "checkbox")
+            } else {
+                tableView.cellForRow(at: indexPath)?.accessoryType = .none
+                tarefa.setValue(false, forKey: "checkbox")
+            }
+            
+            do {
+                try contexto.save()
+            } catch let erro  {
+                print("Erro ao atualizar tarefa:" + erro.localizedDescription)
+            }
         } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .disclosureIndicator
+            return
         }
     }
     
