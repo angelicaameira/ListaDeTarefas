@@ -10,8 +10,8 @@ import CoreData
 
 class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaInicialTableViewControllerDelegate, UINavigationControllerDelegate {
     func chamaRecuperaListas() {
-//        let telaInicial: TelaInicialTableViewController
-//        telaInicial.recuperaListas()
+        //        let telaInicial: TelaInicialTableViewController
+        //        telaInicial.recuperaListas()
     }
     
     var contexto: NSManagedObjectContext!
@@ -24,14 +24,14 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         view.title = "Ok"
         view.action = #selector(ok)
         return view
-      }()
+    }()
     
     private lazy var botaoCancelar: UIBarButtonItem = {
         let view = UIBarButtonItem()
         view.title = "Cancelar"
         view.action = #selector(cancelar)
         return view
-      }()
+    }()
     
     private lazy var campoDescricao: UITextField = {
         let view = UITextField()
@@ -41,7 +41,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         view.returnKeyType = .done
         view.becomeFirstResponder()
         return view
-      }()
+    }()
     
     override func loadView() {
         super.loadView()
@@ -53,15 +53,15 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         
         if listaSelecionada != nil {
             self.title = "Nova lista"
-        }else{
+        } else {
             self.title = "Editar lista"
         }
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-
+        
         campoDescricao.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 60).isActive = true
         campoDescricao.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).isActive = true
         campoDescricao.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20).isActive = true
@@ -72,24 +72,21 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
     }
     
     @objc func ok() {
-        
         if listaSelecionada == nil {
             salvarNovaLista()
         } else {
             atualizarNomeDaLista()
         }
-        self.navigationController?.dismiss(animated: true) { [unowned self] in
-            chamaRecuperaListas()
-        }
+        self.navigationController?.dismiss(animated: true, completion: nil)
+        chamaRecuperaListas()
     }
     
     @objc func cancelar() {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func salvarNovaLista(){
+    func salvarNovaLista() {
         let novaLista = NSEntityDescription.insertNewObject(forEntityName: "Lista", into: contexto)
-        
         novaLista.setValue(self.campoDescricao.text, forKey: "descricao")
         
         do {
@@ -100,7 +97,6 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
     }
     
     func atualizarNomeDaLista() {
-        
         if let lista = self.listaSelecionada {
             lista.setValue(self.campoDescricao.text, forKey: "descricao")
             

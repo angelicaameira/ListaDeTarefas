@@ -22,7 +22,7 @@ class TelaInicialTableViewController: UITableViewController {
         view.target = self
         view.action = #selector(vaiParaAdicionarLista)
         return view
-      }()
+    }()
     
     @objc func vaiParaAdicionarLista() {
         self.present(UINavigationController(rootViewController: AdicionaListaViewController()), animated: true)
@@ -33,7 +33,7 @@ class TelaInicialTableViewController: UITableViewController {
         self.navigationItem.title = "Minhas listas"
         self.navigationItem.rightBarButtonItems = [botaoAdicionarLista]
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -67,9 +67,8 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func removeLista(indexPath: IndexPath) {
-        
         if let lista = self.listaDeListas?[indexPath.row],
-        let contexto = self.contexto {
+           let contexto = self.contexto {
             contexto.delete(lista)
             self.listaDeListas?.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -83,23 +82,23 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return listaDeListas?.count ?? 0
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
-
+        
         let dadosLista = self.listaDeListas?[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
-
+        
         return celula
     }
     
