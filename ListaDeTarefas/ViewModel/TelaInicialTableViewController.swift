@@ -37,7 +37,7 @@ class TelaInicialTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasListas")
+        self.tableView.register(CelulaListaTableViewCell.self, forCellReuseIdentifier: "celulaLista")
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         contexto = appDelegate.persistentContainer.viewContext
@@ -94,14 +94,14 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
+        guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell
+        else { return UITableViewCell() }
+        
         let dadosLista = self.listaDeListas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
-        
-        let checkbox = dadosLista.value(forKey: "checkbox") as? Bool
-        celula.accessoryType = .disclosureIndicator
+        celula.detailTextLabel?.text = "10"
       
         return celula
     }

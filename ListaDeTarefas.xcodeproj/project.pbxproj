@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF34C3D12822C2FF0000D455 /* CelulaListaTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF34C3D02822C2FF0000D455 /* CelulaListaTableViewCell.swift */; };
 		BF55EAEA2815C12300C1D2A4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF55EAE92815C12300C1D2A4 /* AppDelegate.swift */; };
 		BF55EAEC2815C12300C1D2A4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF55EAEB2815C12300C1D2A4 /* SceneDelegate.swift */; };
 		BF55EAF12815C12300C1D2A4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF55EAEF2815C12300C1D2A4 /* Main.storyboard */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BF34C3D02822C2FF0000D455 /* CelulaListaTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelulaListaTableViewCell.swift; sourceTree = "<group>"; };
 		BF55EAE62815C12300C1D2A4 /* ListaDeTarefas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ListaDeTarefas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF55EAE92815C12300C1D2A4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BF55EAEB2815C12300C1D2A4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -45,6 +47,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BF34C3CF2822C2B60000D455 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BF34C3D02822C2FF0000D455 /* CelulaListaTableViewCell.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		BF55EADD2815C12300C1D2A4 = {
 			isa = PBXGroup;
 			children = (
@@ -64,6 +74,7 @@
 		BF55EAE82815C12300C1D2A4 /* ListaDeTarefas */ = {
 			isa = PBXGroup;
 			children = (
+				BF34C3CF2822C2B60000D455 /* Model */,
 				BFF63BB42816ECB600E6F5D2 /* ViewModel */,
 				BF55EAE92815C12300C1D2A4 /* AppDelegate.swift */,
 				BF55EAEB2815C12300C1D2A4 /* SceneDelegate.swift */,
@@ -165,6 +176,7 @@
 				BFF63BBB2816EF9800E6F5D2 /* TelaInicialTableViewController.swift in Sources */,
 				BF55EAF42815C12300C1D2A4 /* ListaDeTarefas.xcdatamodeld in Sources */,
 				BFF63BBF28170AD500E6F5D2 /* AdicionaListaViewController.swift in Sources */,
+				BF34C3D12822C2FF0000D455 /* CelulaListaTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
