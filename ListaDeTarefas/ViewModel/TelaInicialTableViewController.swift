@@ -53,7 +53,6 @@ class TelaInicialTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            
             if let contexto = contexto {
                 let listasRecuperadas = try contexto.fetch(requisicao)
                 self.listaDeListas = listasRecuperadas as? [NSManagedObject]
@@ -67,17 +66,17 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func removeLista(indexPath: IndexPath) {
-        if let lista = self.listaDeListas?[indexPath.row],
-           let contexto = self.contexto {
-            contexto.delete(lista)
-            self.listaDeListas?.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro {
-                print("Erro ao remover lista:" + erro.localizedDescription)
-            }
+        guard let lista = self.listaDeListas?[indexPath.row],
+              let contexto = self.contexto
+        else { return }
+        contexto.delete(lista)
+        self.listaDeListas?.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao remover lista:" + erro.localizedDescription)
         }
     }
     

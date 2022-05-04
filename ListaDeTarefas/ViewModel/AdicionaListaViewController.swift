@@ -97,23 +97,21 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
     }
     
     func atualizarNomeDaLista() {
-        if let lista = self.listaSelecionada {
-            lista.setValue(self.campoDescricao.text, forKey: "descricao")
-            
-            do {
-                try contexto.save()
-            } catch let erro {
-                print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
-            }
-        } else {
-            return
+        guard let lista = self.listaSelecionada
+        else { return } // encerra imediatamente
+        lista.setValue(self.campoDescricao.text, forKey: "descricao")
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
         }
     }
     
     func setup() {
-        if let lista = self.listaSelecionada {
-            campoDescricao.text = lista.value(forKey: "descricao") as? String
-        }
+        guard let lista = self.listaSelecionada
+        else { return }
+        campoDescricao.text = lista.value(forKey: "descricao") as? String
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
