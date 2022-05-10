@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class TelaInicialTableViewController: UITableViewController {
+class TelaInicialTableViewController: UITableViewController, TelaInicialTableViewControllerDelegate {
     
     var contexto: NSManagedObjectContext!
     var listaDeListas: [NSManagedObject] = []
@@ -25,7 +25,9 @@ class TelaInicialTableViewController: UITableViewController {
     }()
     
     @objc func vaiParaAdicionarLista() {
-        self.present(UINavigationController(rootViewController: AdicionaListaViewController()), animated: true)
+        let viewDeDestino = AdicionaListaViewController()
+        viewDeDestino.delegate = self
+        self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
     }
     
     override func loadView() {
@@ -41,11 +43,13 @@ class TelaInicialTableViewController: UITableViewController {
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         contexto = appDelegate.persistentContainer.viewContext
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         recuperaListas()
+        contaQuantidadeDeTarefasAFazer()
     }
     
     func recuperaListas() {
@@ -64,6 +68,27 @@ class TelaInicialTableViewController: UITableViewController {
             }
         } catch let erro {
             print("Erro ao carregar listas:" + erro.localizedDescription)
+        }
+    }
+    
+    func contaQuantidadeDeTarefasAFazer() {
+        var contador = 0
+        for lista in listaDeListas {
+            let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
+            requisicao.predicate = NSPredicate(format: "lista = %@ and checkbox = false", lista)
+            
+            do {
+                if let contexto = contexto {
+                    contador = try contexto.count(for: requisicao)
+                    lista.setValue(contador, forKey: "quantidade")
+                    try contexto.save()
+                    tableView.reloadData()
+                } else {
+                    return
+                }
+            } catch let erro {
+                print("Erro ao salvar listas:" + erro.localizedDescription)
+            }
         }
     }
     
@@ -96,12 +121,14 @@ class TelaInicialTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell
         else { return UITableViewCell() }
-        
         let dadosLista = self.listaDeListas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
-        celula.detailTextLabel?.text = "10"
+        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as? String)
+
+        if let valor = dadosLista.value(forKey: "quantidade") as? Int {
+            celula.detailTextLabel?.text = "\(valor)"
+        }
       
         return celula
     }
@@ -127,6 +154,7 @@ class TelaInicialTableViewController: UITableViewController {
                 self.listaSelecionada = self.listaDeListas[indice]
                 let viewDeDestino = AdicionaListaViewController()
                 viewDeDestino.listaSelecionada = self.listaSelecionada
+                viewDeDestino.delegate = self
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
             })
         ]
@@ -135,5 +163,5 @@ class TelaInicialTableViewController: UITableViewController {
 }
 
 protocol TelaInicialTableViewControllerDelegate: AnyObject {
-    func chamaRecuperaListas()
+    func recuperaListas()
 }

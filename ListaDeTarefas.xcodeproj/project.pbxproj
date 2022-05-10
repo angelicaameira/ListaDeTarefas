@@ -14,6 +14,7 @@
 		BF55EAF42815C12300C1D2A4 /* ListaDeTarefas.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BF55EAF22815C12300C1D2A4 /* ListaDeTarefas.xcdatamodeld */; };
 		BF55EAF62815C12300C1D2A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF55EAF52815C12300C1D2A4 /* Assets.xcassets */; };
 		BF55EAF92815C12300C1D2A4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF55EAF72815C12300C1D2A4 /* LaunchScreen.storyboard */; };
+		BFD3F5E528295AC8008C6F88 /* CelulaTarefaTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3F5E428295AC8008C6F88 /* CelulaTarefaTableViewCell.swift */; };
 		BFF63BBB2816EF9800E6F5D2 /* TelaInicialTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BBA2816EF9800E6F5D2 /* TelaInicialTableViewController.swift */; };
 		BFF63BBF28170AD500E6F5D2 /* AdicionaListaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BBE28170AD500E6F5D2 /* AdicionaListaViewController.swift */; };
 		BFF63BC12818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BC02818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift */; };
@@ -30,6 +31,7 @@
 		BF55EAF52815C12300C1D2A4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF55EAF82815C12300C1D2A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BF55EAFA2815C12300C1D2A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BFD3F5E428295AC8008C6F88 /* CelulaTarefaTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelulaTarefaTableViewCell.swift; sourceTree = "<group>"; };
 		BFF63BBA2816EF9800E6F5D2 /* TelaInicialTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelaInicialTableViewController.swift; sourceTree = "<group>"; };
 		BFF63BBE28170AD500E6F5D2 /* AdicionaListaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdicionaListaViewController.swift; sourceTree = "<group>"; };
 		BFF63BC02818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListaDeTarefasTableViewController.swift; sourceTree = "<group>"; };
@@ -47,12 +49,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BF34C3CF2822C2B60000D455 /* Model */ = {
+		BF34C3CF2822C2B60000D455 /* View */ = {
 			isa = PBXGroup;
 			children = (
 				BF34C3D02822C2FF0000D455 /* CelulaListaTableViewCell.swift */,
+				BFD3F5E428295AC8008C6F88 /* CelulaTarefaTableViewCell.swift */,
 			);
-			path = Model;
+			path = View;
 			sourceTree = "<group>";
 		};
 		BF55EADD2815C12300C1D2A4 = {
@@ -74,7 +77,7 @@
 		BF55EAE82815C12300C1D2A4 /* ListaDeTarefas */ = {
 			isa = PBXGroup;
 			children = (
-				BF34C3CF2822C2B60000D455 /* Model */,
+				BF34C3CF2822C2B60000D455 /* View */,
 				BFF63BB42816ECB600E6F5D2 /* ViewModel */,
 				BF55EAE92815C12300C1D2A4 /* AppDelegate.swift */,
 				BF55EAEB2815C12300C1D2A4 /* SceneDelegate.swift */,
@@ -171,6 +174,7 @@
 			files = (
 				BF55EAEA2815C12300C1D2A4 /* AppDelegate.swift in Sources */,
 				BFF63BC12818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift in Sources */,
+				BFD3F5E528295AC8008C6F88 /* CelulaTarefaTableViewCell.swift in Sources */,
 				BF55EAEC2815C12300C1D2A4 /* SceneDelegate.swift in Sources */,
 				BFF63BC328184F4500E6F5D2 /* AdicionaTarefaViewController.swift in Sources */,
 				BFF63BBB2816EF9800E6F5D2 /* TelaInicialTableViewController.swift in Sources */,
@@ -331,6 +335,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -359,6 +364,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
