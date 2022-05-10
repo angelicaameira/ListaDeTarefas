@@ -53,13 +53,11 @@ class TelaInicialTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            if let contexto = contexto {
-                let listasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeListas = listasRecuperadas as? [NSManagedObject]
-                tableView.reloadData()
-            } else {
-                return
-            }
+            guard let contexto = contexto else { return }
+            let listasRecuperadas = try contexto.fetch(requisicao)
+            self.listaDeListas = listasRecuperadas as? [NSManagedObject]
+            tableView.reloadData()
+            
         } catch let erro {
             print("Erro ao carregar listas:" + erro.localizedDescription)
         }
