@@ -60,7 +60,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         
         if tarefaSelecionada != nil {
             self.title = "Editar tarefa"
-        }else{
+        } else {
             self.title = "Nova tarefa"
         }
     }

@@ -65,7 +65,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
                 let tarefasRecuperadas = try contexto.fetch(requisicao)
                 self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
                 tableView.reloadData()
-            }else{
+            } else {
                 return
             }
         } catch let erro {

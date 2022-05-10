@@ -101,7 +101,7 @@ class TelaInicialTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        self.listaSelecionada = self.listaDeListas[indexPath.row]
+        self.listaSelecionada = self.listaDeListas?[indexPath.row]
         let viewDestino = ListaDeTarefasTableViewController()
         viewDestino.listaSelecionada = self.listaSelecionada
         self.navigationController?.pushViewController(viewDestino, animated: true)

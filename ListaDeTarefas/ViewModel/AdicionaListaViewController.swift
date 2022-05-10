@@ -54,7 +54,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         if listaSelecionada != nil {
             self.title = "Editar lista"
         } else {
-			self.title = "Nova lista"
+            self.title = "Nova lista"
         }
     }
     
