@@ -34,7 +34,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func loadView() {
         super.loadView()
         
-        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as! String)
+        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as? String)
         self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
     
@@ -53,21 +53,20 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     func recuperaTarefas() {
-        guard let lista = listaSelecionada
-        else { return }
+        guard let lista = listaSelecionada else { return }
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
-        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
+        
+        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            if let contexto = contexto {
+            guard let contexto = contexto else { return }
                 let tarefasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
+                guard let tarefasRecuperadas = tarefasRecuperadas as? [NSManagedObject]
+                else { return }
+                self.listaDeTarefas = tarefasRecuperadas
                 tableView.reloadData()
-            } else {
-                return
-            }
         } catch let erro {
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
@@ -102,7 +101,8 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
-        guard ((celula.textLabel?.text = (dadosTarefa.value(forKey: "descricao") as? String)) != nil) else { return celula }
+        
+        celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
         celula.accessoryType = .disclosureIndicator
         
         return celula

@@ -111,27 +111,25 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    func atualizarTarefa(){
+    func atualizarTarefa() {
         if let tarefa = self.tarefaSelecionada{
             tarefa.setValue(self.campoDescricao.text, forKey: "descricao")
             tarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
             
             do {
                 try contexto.save()
-            } catch let erro  {
+            } catch let erro {
                 print("Erro ao atualizar tarefa:" + erro.localizedDescription)
             }
-        }
-        else {
+        } else {
             return
         }
     }
     
     func setup() {
-        if let tarefa = self.tarefaSelecionada{
-            campoDescricao.text = ((tarefa.value(forKey: "descricao")) as! String)
-            campoDetalhes.text = ((tarefa.value(forKey: "detalhes")) as! String)
-        }
+        guard let tarefa = self.tarefaSelecionada else { return }
+            campoDescricao.text = ((tarefa.value(forKey: "descricao")) as? String)
+            campoDetalhes.text = ((tarefa.value(forKey: "detalhes")) as? String)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
