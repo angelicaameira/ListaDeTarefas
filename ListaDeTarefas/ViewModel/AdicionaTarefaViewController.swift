@@ -14,6 +14,8 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
     var tarefaSelecionada: NSManagedObject?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
+    var alertAdicionar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao adicionar uma nova tarefa", preferredStyle: .alert)
+    var alertEditar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao editar a tarefa", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -111,6 +113,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
             do {
                 try contexto.save()
             } catch let erro {
+                self.alertAdicionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao salvar tarefa:" + erro.localizedDescription)
             }
         }
@@ -124,6 +127,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
             do {
                 try contexto.save()
             } catch let erro  {
+                self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao atualizar tarefa:" + erro.localizedDescription)
             }
         }

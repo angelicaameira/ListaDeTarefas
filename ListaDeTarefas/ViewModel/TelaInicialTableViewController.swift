@@ -13,6 +13,9 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     var contexto: NSManagedObjectContext!
     var listaDeListas: [NSManagedObject] = []
     var listaSelecionada: NSManagedObject?
+    var alertMostrar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao mostrar as listas", preferredStyle: .alert)
+    var alertContar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao contar a quantidade de tarefas a fazer", preferredStyle: .alert)
+    var alertRemover = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao remover a lista", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -67,6 +70,7 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
                 return
             }
         } catch let erro {
+            self.alertMostrar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
             print("Erro ao carregar listas:" + erro.localizedDescription)
         }
     }
@@ -87,6 +91,7 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
                     return
                 }
             } catch let erro {
+                self.alertContar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao salvar listas:" + erro.localizedDescription)
             }
         }
@@ -103,6 +108,7 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
             do {
                 try contexto.save()
             } catch let erro  {
+                self.alertRemover.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao remover lista:" + erro.localizedDescription)
             }
         }

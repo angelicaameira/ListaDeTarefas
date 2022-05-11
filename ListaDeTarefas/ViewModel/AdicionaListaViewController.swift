@@ -13,6 +13,8 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
     weak var delegate: TelaInicialTableViewControllerDelegate?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
+    var alertAdicionar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao adicionar uma nova lista", preferredStyle: .alert)
+    var alertEditar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao editar a lista", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -92,6 +94,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
         do {
             try contexto.save()
         } catch let erro  {
+            self.alertAdicionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
             print("Erro ao salvar lista:" + erro.localizedDescription)
         }
     }
@@ -103,6 +106,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
             do {
                 try contexto.save()
             } catch let erro  {
+                self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
             }
         } else {

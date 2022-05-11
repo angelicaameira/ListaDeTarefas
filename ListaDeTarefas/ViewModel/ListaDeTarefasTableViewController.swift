@@ -14,6 +14,9 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
     var tarefaSelecionada: NSManagedObject?
     var contexto: NSManagedObjectContext!
     var listaDeTarefas: [NSManagedObject] = []
+    var alertMostrar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao mostrar as tarefas", preferredStyle: .alert)
+    var alertRemover = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao remover a tarefa", preferredStyle: .alert)
+    var alertSelecionar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao selecionar a tarefa", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -71,6 +74,7 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
                 return
             }
         } catch let erro {
+            self.alertMostrar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
     }
@@ -86,6 +90,7 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
             do {
                 try contexto.save()
             } catch let erro  {
+                self.alertRemover.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao remover tarefa:" + erro.localizedDescription)
             }
         }
@@ -136,7 +141,8 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         do {
             try contexto.save()
         } catch let erro  {
-            print("Erro ao atualizar tarefa:" + erro.localizedDescription)
+            self.alertSelecionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
+            print("Erro ao selecionar tarefa:" + erro.localizedDescription)
         }
     }
     
