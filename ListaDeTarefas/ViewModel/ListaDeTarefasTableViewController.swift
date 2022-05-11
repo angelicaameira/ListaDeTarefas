@@ -63,8 +63,9 @@ class ListaDeTarefasTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            guard let contexto = contexto,
-            let tarefasRecuperadas = try contexto.fetch(requisicao) as? [NSManagedObject]
+            guard
+                let contexto = contexto,
+                let tarefasRecuperadas = try contexto.fetch(requisicao) as? [NSManagedObject]
             else { return }
             self.listaDeTarefas = tarefasRecuperadas
             tableView.reloadData()
@@ -73,19 +74,19 @@ class ListaDeTarefasTableViewController: UITableViewController {
         }
     }
     
-    func removeTarefa(indexPath: IndexPath){
+    func removeTarefa(indexPath: IndexPath) {
         let tarefa = self.listaDeTarefas[indexPath.row]
         
-        if let contexto = self.contexto{
-            contexto.delete(tarefa)
-            self.listaDeTarefas.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro {
-                print("Erro ao remover tarefa:" + erro.localizedDescription)
-            }
+        guard let contexto = self.contexto
+        else { return }
+        contexto.delete(tarefa)
+        self.listaDeTarefas.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao remover tarefa:" + erro.localizedDescription)
         }
     }
     

@@ -79,7 +79,8 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         campoDescricao.delegate = self
         campoDetalhes.delegate = self
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -96,18 +97,18 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func salvarNovaTarefa(){
-        if let lista = listaSelecionada {
-            let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
-            novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
-            novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
-            novaTarefa.setValue(lista, forKey: "lista")
-            
-            do {
-                try contexto.save()
-            } catch let erro {
-                print("Erro ao salvar tarefa:" + erro.localizedDescription)
-            }
+    func salvarNovaTarefa() {
+        guard let lista = listaSelecionada
+        else { return }
+        let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
+        novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
+        novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+        novaTarefa.setValue(lista, forKey: "lista")
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao salvar tarefa:" + erro.localizedDescription)
         }
     }
     
