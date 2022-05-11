@@ -34,7 +34,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func loadView() {
         super.loadView()
         
-        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as? String)
+        self.navigationItem.title = listaSelecionada?.value(forKey: "descricao") as? String
         self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
     
@@ -43,7 +43,8 @@ class ListaDeTarefasTableViewController: UITableViewController {
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasTarefas")
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -53,7 +54,8 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     func recuperaTarefas() {
-        guard let lista = listaSelecionada else { return }
+        guard let lista = listaSelecionada
+        else { return }
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
         
@@ -61,12 +63,11 @@ class ListaDeTarefasTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            guard let contexto = contexto else { return }
-                let tarefasRecuperadas = try contexto.fetch(requisicao)
-                guard let tarefasRecuperadas = tarefasRecuperadas as? [NSManagedObject]
-                else { return }
-                self.listaDeTarefas = tarefasRecuperadas
-                tableView.reloadData()
+            guard let contexto = contexto,
+            let tarefasRecuperadas = try contexto.fetch(requisicao) as? [NSManagedObject]
+            else { return }
+            self.listaDeTarefas = tarefasRecuperadas
+            tableView.reloadData()
         } catch let erro {
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
@@ -82,7 +83,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
             
             do {
                 try contexto.save()
-            } catch let erro  {
+            } catch let erro {
                 print("Erro ao remover tarefa:" + erro.localizedDescription)
             }
         }
@@ -120,12 +121,14 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 self.removeTarefa(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 let indice = indexPath.row
                 self.tarefaSelecionada = self.listaDeTarefas[indice]
                 let viewDeDestino = AdicionaTarefaViewController()

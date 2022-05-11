@@ -97,7 +97,8 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
     }
     
     func atualizarNomeDaLista() {
-        guard let lista = self.listaSelecionada else { return } 
+        guard let lista = self.listaSelecionada
+        else { return } 
         lista.setValue(self.campoDescricao.text, forKey: "descricao")
         
         do {
