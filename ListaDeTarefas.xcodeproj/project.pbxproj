@@ -15,6 +15,8 @@
 		BF55EAF92815C12300C1D2A4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BF55EAF72815C12300C1D2A4 /* LaunchScreen.storyboard */; };
 		BFF63BBB2816EF9800E6F5D2 /* TelaInicialTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BBA2816EF9800E6F5D2 /* TelaInicialTableViewController.swift */; };
 		BFF63BBF28170AD500E6F5D2 /* AdicionaListaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BBE28170AD500E6F5D2 /* AdicionaListaViewController.swift */; };
+		BFF63BC12818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BC02818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift */; };
+		BFF63BC328184F4500E6F5D2 /* AdicionaTarefaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF63BC228184F4500E6F5D2 /* AdicionaTarefaViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		BF55EAFA2815C12300C1D2A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BFF63BBA2816EF9800E6F5D2 /* TelaInicialTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelaInicialTableViewController.swift; sourceTree = "<group>"; };
 		BFF63BBE28170AD500E6F5D2 /* AdicionaListaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdicionaListaViewController.swift; sourceTree = "<group>"; };
+		BFF63BC02818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListaDeTarefasTableViewController.swift; sourceTree = "<group>"; };
+		BFF63BC228184F4500E6F5D2 /* AdicionaTarefaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdicionaTarefaViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +81,8 @@
 			children = (
 				BFF63BBA2816EF9800E6F5D2 /* TelaInicialTableViewController.swift */,
 				BFF63BBE28170AD500E6F5D2 /* AdicionaListaViewController.swift */,
+				BFF63BC02818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift */,
+				BFF63BC228184F4500E6F5D2 /* AdicionaTarefaViewController.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -153,7 +159,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF55EAEA2815C12300C1D2A4 /* AppDelegate.swift in Sources */,
+				BFF63BC12818444E00E6F5D2 /* ListaDeTarefasTableViewController.swift in Sources */,
 				BF55EAEC2815C12300C1D2A4 /* SceneDelegate.swift in Sources */,
+				BFF63BC328184F4500E6F5D2 /* AdicionaTarefaViewController.swift in Sources */,
 				BFF63BBB2816EF9800E6F5D2 /* TelaInicialTableViewController.swift in Sources */,
 				BF55EAF42815C12300C1D2A4 /* ListaDeTarefas.xcdatamodeld in Sources */,
 				BFF63BBF28170AD500E6F5D2 /* AdicionaListaViewController.swift in Sources */,
