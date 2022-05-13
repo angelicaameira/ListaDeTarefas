@@ -10,8 +10,8 @@ import CoreData
 
 class TelaInicialTableViewController: UITableViewController {
     
-    var contexto: NSManagedObjectContext!
-    var listaDeListas: [NSManagedObject] = []
+    var contexto: NSManagedObjectContext?
+    var listaDeListas: [NSManagedObject]? = []
     var listaSelecionada: NSManagedObject?
     
     // MARK: - View code
@@ -39,7 +39,8 @@ class TelaInicialTableViewController: UITableViewController {
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasListas")
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -54,32 +55,29 @@ class TelaInicialTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
+            guard let contexto = contexto
+            else { return }
+            let listasRecuperadas = try contexto.fetch(requisicao)
+            self.listaDeListas = listasRecuperadas as? [NSManagedObject]
+            tableView.reloadData()
             
-            if let contexto = contexto {
-                let listasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeListas = listasRecuperadas as! [NSManagedObject]
-                tableView.reloadData()
-            }else{
-                return
-            }
         } catch let erro {
             print("Erro ao carregar listas:" + erro.localizedDescription)
         }
     }
     
-    func removeLista(indexPath: IndexPath){
-        let lista = self.listaDeListas[indexPath.row]
+    func removeLista(indexPath: IndexPath) {
+        guard let lista = self.listaDeListas?[indexPath.row],
+              let contexto = self.contexto
+        else { return }
+        contexto.delete(lista)
+        self.listaDeListas?.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
         
-        if let contexto = self.contexto{
-            contexto.delete(lista)
-            self.listaDeListas.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
-                print("Erro ao remover lista:" + erro.localizedDescription)
-            }
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao remover lista:" + erro.localizedDescription)
         }
     }
     
@@ -90,15 +88,15 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listaDeListas.count
+        return listaDeListas?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
-        let dadosLista = self.listaDeListas[indexPath.row]
+        let dadosLista = self.listaDeListas?[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as! String)
+        celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
         
         let checkbox = dadosLista.value(forKey: "checkbox") as? Bool
         celula.accessoryType = .disclosureIndicator
@@ -108,7 +106,7 @@ class TelaInicialTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        self.listaSelecionada = self.listaDeListas[indexPath.row]
+        self.listaSelecionada = self.listaDeListas?[indexPath.row]
         let viewDestino = ListaDeTarefasTableViewController()
         viewDestino.listaSelecionada = self.listaSelecionada
         self.navigationController?.pushViewController(viewDestino, animated: true)
@@ -117,14 +115,16 @@ class TelaInicialTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 self.removeLista(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 let indice = indexPath.row
-                self.listaSelecionada = self.listaDeListas[indice]
+                self.listaSelecionada = self.listaDeListas?[indice]
                 let viewDeDestino = AdicionaListaViewController()
                 viewDeDestino.listaSelecionada = self.listaSelecionada
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)

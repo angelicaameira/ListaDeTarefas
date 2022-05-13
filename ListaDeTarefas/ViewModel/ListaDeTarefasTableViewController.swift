@@ -34,7 +34,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func loadView() {
         super.loadView()
         
-        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as! String)
+        self.navigationItem.title = listaSelecionada?.value(forKey: "descricao") as? String
         self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
     
@@ -43,7 +43,8 @@ class ListaDeTarefasTableViewController: UITableViewController {
         
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasTarefas")
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -56,36 +57,36 @@ class ListaDeTarefasTableViewController: UITableViewController {
         guard let lista = listaSelecionada
         else { return }
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
-        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
+        
+        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            if let contexto = contexto {
-                let tarefasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
-                tableView.reloadData()
-            } else {
-                return
-            }
+            guard
+                let contexto = contexto,
+                let tarefasRecuperadas = try contexto.fetch(requisicao) as? [NSManagedObject]
+            else { return }
+            self.listaDeTarefas = tarefasRecuperadas
+            tableView.reloadData()
         } catch let erro {
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
     }
     
-    func removeTarefa(indexPath: IndexPath){
+    func removeTarefa(indexPath: IndexPath) {
         let tarefa = self.listaDeTarefas[indexPath.row]
         
-        if let contexto = self.contexto{
-            contexto.delete(tarefa)
-            self.listaDeTarefas.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
-                print("Erro ao remover tarefa:" + erro.localizedDescription)
-            }
+        guard let contexto = self.contexto
+        else { return }
+        contexto.delete(tarefa)
+        self.listaDeTarefas.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao remover tarefa:" + erro.localizedDescription)
         }
     }
     
@@ -102,10 +103,8 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
-        let descricao = dadosTarefa.value(forKey: "descricao") as? String
-        celula.textLabel?.text = descricao
+        celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
         let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
-        
         if checkbox == true {
             celula.accessoryType = .checkmark
         } else {
@@ -140,12 +139,14 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 self.removeTarefa(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 let indice = indexPath.row
                 self.tarefaSelecionada = self.listaDeTarefas[indice]
                 let viewDeDestino = AdicionaTarefaViewController()
