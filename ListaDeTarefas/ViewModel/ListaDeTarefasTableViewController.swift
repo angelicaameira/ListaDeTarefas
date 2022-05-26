@@ -117,22 +117,22 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
-        if let tarefa = self.tarefaSelecionada{
-            if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none {
-                tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-                tarefa.setValue(true, forKey: "checkbox")
-            } else {
-                tableView.cellForRow(at: indexPath)?.accessoryType = .none
-                tarefa.setValue(false, forKey: "checkbox")
-            }
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
-                print("Erro ao atualizar tarefa:" + erro.localizedDescription)
-            }
+        
+        guard let tarefa = self.tarefaSelecionada
+        else { return }
+        
+        if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            tarefa.setValue(true, forKey: "checkbox")
         } else {
-            return
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            tarefa.setValue(false, forKey: "checkbox")
+        }
+        
+        do {
+            try contexto.save()
+        } catch let erro  {
+            print("Erro ao atualizar tarefa:" + erro.localizedDescription)
         }
     }
     
