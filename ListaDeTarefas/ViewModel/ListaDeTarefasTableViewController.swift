@@ -103,13 +103,13 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
         let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
+        
         celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
-        let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
-        if checkbox == true {
-            celula.accessoryType = .checkmark
-        } else {
-            celula.accessoryType = .none
-        }
+        
+        guard let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
+        else { return celula }
+        
+        celula.accessoryType = checkbox ? .checkmark : .none
         
         return celula
     }
@@ -118,15 +118,15 @@ class ListaDeTarefasTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
         
-        guard let tarefa = self.tarefaSelecionada
+        guard let checkboxTarefa = self.tarefaSelecionada?.value(forKey: "checkbox") as? Bool
         else { return }
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none {
+        if checkboxTarefa == false {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-            tarefa.setValue(true, forKey: "checkbox")
+            tarefaSelecionada?.setValue(true, forKey: "checkbox")
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
-            tarefa.setValue(false, forKey: "checkbox")
+            tarefaSelecionada?.setValue(false, forKey: "checkbox")
         }
         
         do {

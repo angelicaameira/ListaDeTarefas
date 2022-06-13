@@ -97,8 +97,6 @@ class TelaInicialTableViewController: UITableViewController {
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
-        
-        _ = dadosLista?.value(forKey: "checkbox") as? Bool
         celula.accessoryType = .disclosureIndicator
       
         return celula
