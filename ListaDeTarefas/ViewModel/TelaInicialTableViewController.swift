@@ -67,8 +67,9 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     func removeLista(indexPath: IndexPath) {
-        guard let lista = self.listaDeListas?[indexPath.row],
-              let contexto = self.contexto
+        guard
+            let lista = self.listaDeListas?[indexPath.row],
+            let contexto = self.contexto
         else { return }
         contexto.delete(lista)
         self.listaDeListas?.remove(at: indexPath.row)
@@ -97,6 +98,7 @@ class TelaInicialTableViewController: UITableViewController {
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
+        celula.accessoryType = .disclosureIndicator
         
         return celula
     }

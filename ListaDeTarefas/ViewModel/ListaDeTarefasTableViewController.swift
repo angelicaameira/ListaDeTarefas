@@ -12,7 +12,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     
     var listaSelecionada: NSManagedObject?
     var tarefaSelecionada: NSManagedObject?
-    var contexto: NSManagedObjectContext?
+    var contexto: NSManagedObjectContext!
     var listaDeTarefas: [NSManagedObject] = []
     
     // MARK: - View code
@@ -101,21 +101,38 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
+        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
         
         celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
-        celula.accessoryType = .disclosureIndicator
+        
+        guard let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
+        else { return celula }
+        
+        celula.accessoryType = checkbox ? .checkmark : .none
         
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
+        self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
+        
+        guard let checkboxTarefa = self.tarefaSelecionada?.value(forKey: "checkbox") as? Bool
+        else { return }
+        
+        if checkboxTarefa == false {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            tarefaSelecionada?.setValue(true, forKey: "checkbox")
         } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .disclosureIndicator
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            tarefaSelecionada?.setValue(false, forKey: "checkbox")
+        }
+        
+        do {
+            try contexto.save()
+        } catch let erro  {
+            print("Erro ao atualizar tarefa:" + erro.localizedDescription)
         }
     }
     
