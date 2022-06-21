@@ -8,7 +8,7 @@
 import UIKit
 
 class CelulaListaTableViewCell: UITableViewCell {
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: "celulaLista")
     }
@@ -16,5 +16,4 @@ class CelulaListaTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
 }

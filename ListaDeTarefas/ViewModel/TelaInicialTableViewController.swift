@@ -72,19 +72,24 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     
     func contaQuantidadeDeTarefasAFazer() {
         var contador = 0
+        
+        guard let listaDeListas = listaDeListas
+        else { return }
+        
         for lista in listaDeListas {
             let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
             requisicao.predicate = NSPredicate(format: "lista = %@ and checkbox = false", lista)
             
             do {
-                if let contexto = contexto {
-                    contador = try contexto.count(for: requisicao)
-                    lista.setValue(contador, forKey: "quantidade")
-                    try contexto.save()
-                    tableView.reloadData()
-                } else {
-                    return
-                }
+                
+                guard let contexto = contexto
+                else { return }
+                
+                contador = try contexto.count(for: requisicao)
+                lista.setValue(contador, forKey: "quantidade")
+                try contexto.save()
+                tableView.reloadData()
+                
             } catch let erro {
                 print("Erro ao salvar listas:" + erro.localizedDescription)
             }
@@ -92,14 +97,22 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     }
     
     func removeLista(indexPath: IndexPath){
-        let lista = self.listaDeListas[indexPath.row]
+        guard
+            let lista = self.listaDeListas?[indexPath.row],
+            let contexto = self.contexto
+        else { return }
+        
+        contexto.delete(lista)
+        self.listaDeListas?.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
         
         do {
             try contexto.save()
-        } catch let erro {
+        } catch let erro  {
             print("Erro ao remover lista:" + erro.localizedDescription)
         }
     }
+    
     
     // MARK: - Table view data source
     
@@ -112,17 +125,18 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell
+        guard
+            let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell,
+            let dadosLista = self.listaDeListas?[indexPath.row]
         else { return UITableViewCell() }
-        let dadosLista = self.listaDeListas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as? String)
-
+        
         if let valor = dadosLista.value(forKey: "quantidade") as? Int {
             celula.detailTextLabel?.text = "\(valor)"
         }
-      
+        
         return celula
     }
     

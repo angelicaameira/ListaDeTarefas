@@ -64,14 +64,15 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            if let contexto = contexto {
-                let tarefasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
-                
-                tableView.reloadData()
-            } else {
-                return
-            }
+            
+            guard let contexto = contexto
+            else { return }
+            
+            let tarefasRecuperadas = try contexto.fetch(requisicao)
+            self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
+            
+            tableView.reloadData()
+            
         } catch let erro {
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
@@ -82,6 +83,7 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         
         guard let contexto = self.contexto
         else { return }
+        
         contexto.delete(tarefa)
         self.listaDeTarefas.remove(at: indexPath.row)
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -106,15 +108,15 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaTarefa", for: indexPath) as? CelulaTarefaTableViewCell
         else { return UITableViewCell() }
+        
         let dadosTarefa = self.listaDeTarefas[indexPath.row]
         let descricao = dadosTarefa.value(forKey: "descricao") as? String
         let detalhes = dadosTarefa.value(forKey: "detalhes") as? String
+        
         celula.textLabel?.text = descricao
+        celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
         celula.detailTextLabel?.text = detalhes
         celula.detailTextLabel?.numberOfLines = 0
-        let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
-        
-        celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
         
         guard let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
         else { return celula }
@@ -173,5 +175,3 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
 protocol ListaDeTarefasTableViewControllerDelegate: AnyObject {
     func recuperaTarefas()
 }
-
-
