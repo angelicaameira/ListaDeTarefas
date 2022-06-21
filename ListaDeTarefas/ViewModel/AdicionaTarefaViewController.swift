@@ -63,7 +63,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         
         if tarefaSelecionada != nil {
             self.title = "Editar tarefa"
-        }else{
+        } else {
             self.title = "Nova tarefa"
         }
     }
@@ -82,7 +82,8 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         campoDescricao.delegate = self
         campoDetalhes.delegate = self
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -102,45 +103,41 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func salvarNovaTarefa(){
-        if let lista = listaSelecionada {
-            let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
-            novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
-            novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
-            novaTarefa.setValue(false, forKey: "checkbox")
-            novaTarefa.setValue(lista, forKey: "lista")
-            
-            do {
-                try contexto.save()
-            } catch let erro {
+    func salvarNovaTarefa() {
+        guard let lista = listaSelecionada
+        else { return }
+        let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
+        novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
+        novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+        novaTarefa.setValue(false, forKey: "checkbox")
+        novaTarefa.setValue(lista, forKey: "lista")
+        
+        do {
+            try contexto.save()
+        } catch let erro {
                 self.alertAdicionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao salvar tarefa:" + erro.localizedDescription)
-            }
         }
     }
-    
-    func atualizarTarefa(){
-        if let tarefa = self.tarefaSelecionada{
-            tarefa.setValue(self.campoDescricao.text, forKey: "descricao")
-            tarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
+    func atualizarTarefa() {
+        guard let tarefa = self.tarefaSelecionada
+        else { return }
+        tarefa.setValue(self.campoDescricao.text, forKey: "descricao")
+        tarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+        
+        do {
+            try contexto.save()
+        } catch let erro {
                 self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao atualizar tarefa:" + erro.localizedDescription)
-            }
-        }
-        else {
-            return
         }
     }
     
     func setup() {
-        if let tarefa = self.tarefaSelecionada{
-            campoDescricao.text = ((tarefa.value(forKey: "descricao")) as! String)
-            campoDetalhes.text = ((tarefa.value(forKey: "detalhes")) as! String)
-        }
+        guard let tarefa = self.tarefaSelecionada
+        else { return }
+        campoDescricao.text = tarefa.value(forKey: "descricao") as? String
+        campoDetalhes.text = tarefa.value(forKey: "detalhes") as? String
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

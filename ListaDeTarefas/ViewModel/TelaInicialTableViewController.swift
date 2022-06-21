@@ -10,8 +10,8 @@ import CoreData
 
 class TelaInicialTableViewController: UITableViewController, TelaInicialTableViewControllerDelegate {
     
-    var contexto: NSManagedObjectContext!
-    var listaDeListas: [NSManagedObject] = []
+    var contexto: NSManagedObjectContext?
+    var listaDeListas: [NSManagedObject]? = []
     var listaSelecionada: NSManagedObject?
     var alertMostrar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao mostrar as listas", preferredStyle: .alert)
     var alertContar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao contar a quantidade de tarefas a fazer", preferredStyle: .alert)
@@ -44,7 +44,8 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
         
         self.tableView.register(CelulaListaTableViewCell.self, forCellReuseIdentifier: "celulaLista")
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
         
     }
@@ -61,14 +62,12 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
         requisicao.sortDescriptors = [ordenacao]
         
         do {
+            guard let contexto = contexto
+            else { return }
+            let listasRecuperadas = try contexto.fetch(requisicao)
+            self.listaDeListas = listasRecuperadas as? [NSManagedObject]
+            tableView.reloadData()
             
-            if let contexto = contexto {
-                let listasRecuperadas = try contexto.fetch(requisicao)
-                self.listaDeListas = listasRecuperadas as! [NSManagedObject]
-                tableView.reloadData()
-            }else{
-                return
-            }
         } catch let erro {
             self.alertMostrar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
             print("Erro ao carregar listas:" + erro.localizedDescription)
@@ -77,19 +76,24 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     
     func contaQuantidadeDeTarefasAFazer() {
         var contador = 0
+        
+        guard let listaDeListas = listaDeListas
+        else { return }
+        
         for lista in listaDeListas {
             let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
             requisicao.predicate = NSPredicate(format: "lista = %@ and checkbox = false", lista)
             
             do {
-                if let contexto = contexto {
-                    contador = try contexto.count(for: requisicao)
-                    lista.setValue(contador, forKey: "quantidade")
-                    try contexto.save()
-                    tableView.reloadData()
-                } else {
-                    return
-                }
+                
+                guard let contexto = contexto
+                else { return }
+                
+                contador = try contexto.count(for: requisicao)
+                lista.setValue(contador, forKey: "quantidade")
+                try contexto.save()
+                tableView.reloadData()
+                
             } catch let erro {
                 self.alertContar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao salvar listas:" + erro.localizedDescription)
@@ -98,21 +102,23 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     }
     
     func removeLista(indexPath: IndexPath){
-        let lista = self.listaDeListas[indexPath.row]
+        guard
+            let lista = self.listaDeListas?[indexPath.row],
+            let contexto = self.contexto
+        else { return }
         
-        if let contexto = self.contexto{
-            contexto.delete(lista)
-            self.listaDeListas.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
+        contexto.delete(lista)
+        self.listaDeListas?.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        do {
+            try contexto.save()
+        } catch let erro  {
                 self.alertRemover.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao remover lista:" + erro.localizedDescription)
-            }
         }
     }
+    
     
     // MARK: - Table view data source
     
@@ -121,27 +127,28 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listaDeListas.count
+        return listaDeListas?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell
+        guard
+            let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell,
+            let dadosLista = self.listaDeListas?[indexPath.row]
         else { return UITableViewCell() }
-        let dadosLista = self.listaDeListas[indexPath.row]
         
         celula.accessoryType = .disclosureIndicator
         celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as? String)
-
+        
         if let valor = dadosLista.value(forKey: "quantidade") as? Int {
             celula.detailTextLabel?.text = "\(valor)"
         }
-      
+        
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        self.listaSelecionada = self.listaDeListas[indexPath.row]
+        self.listaSelecionada = self.listaDeListas?[indexPath.row]
         let viewDestino = ListaDeTarefasTableViewController()
         viewDestino.listaSelecionada = self.listaSelecionada
         self.navigationController?.pushViewController(viewDestino, animated: true)
@@ -150,14 +157,16 @@ class TelaInicialTableViewController: UITableViewController, TelaInicialTableVie
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 self.removeLista(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 let indice = indexPath.row
-                self.listaSelecionada = self.listaDeListas[indice]
+                self.listaSelecionada = self.listaDeListas?[indice]
                 let viewDeDestino = AdicionaListaViewController()
                 viewDeDestino.listaSelecionada = self.listaSelecionada
                 viewDeDestino.delegate = self

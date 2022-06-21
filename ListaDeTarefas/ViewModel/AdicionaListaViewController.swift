@@ -52,7 +52,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
         
         if listaSelecionada != nil {
             self.title = "Editar lista"
-        }else{
+        } else {
             self.title = "Nova lista"
         }
     }
@@ -66,13 +66,14 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
         campoDescricao.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20).isActive = true
         campoDescricao.delegate = self
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
         
     }
     
     @objc func ok() {
-        if listaSelecionada == nil{
+        if listaSelecionada == nil {
             salvarNovaLista()
         } else {
             atualizarNomeDaLista()
@@ -87,7 +88,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func salvarNovaLista(){
+    func salvarNovaLista() {
         let novaLista = NSEntityDescription.insertNewObject(forEntityName: "Lista", into: contexto)
         novaLista.setValue(self.campoDescricao.text, forKey: "descricao")
         
@@ -99,25 +100,23 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    func atualizarNomeDaLista(){
-        if let lista = self.listaSelecionada{
-            lista.setValue(self.campoDescricao.text, forKey: "descricao")
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
+    func atualizarNomeDaLista() {
+        guard let lista = self.listaSelecionada
+        else { return } 
+        lista.setValue(self.campoDescricao.text, forKey: "descricao")
+        
+        do {
+            try contexto.save()
+        } catch let erro {
                 self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
                 print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
-            }
-        } else {
-            return
         }
     }
     
     func setup() {
-        if let lista = self.listaSelecionada{
-            campoDescricao.text = ((lista.value(forKey: "descricao")) as! String) 
-        }
+        guard let lista = self.listaSelecionada
+        else { return }
+        campoDescricao.text = lista.value(forKey: "descricao") as? String
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
