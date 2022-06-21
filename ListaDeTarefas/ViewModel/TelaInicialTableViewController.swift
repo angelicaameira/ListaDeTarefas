@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class TelaInicialTableViewController: UITableViewController {
+class TelaInicialTableViewController: UITableViewController, TelaInicialTableViewControllerDelegate {
     
     var contexto: NSManagedObjectContext?
     var listaDeListas: [NSManagedObject]? = []
@@ -25,7 +25,9 @@ class TelaInicialTableViewController: UITableViewController {
     }()
     
     @objc func vaiParaAdicionarLista() {
-        self.present(UINavigationController(rootViewController: AdicionaListaViewController()), animated: true)
+        let viewDeDestino = AdicionaListaViewController()
+        viewDeDestino.delegate = self
+        self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
     }
     
     override func loadView() {
@@ -37,16 +39,18 @@ class TelaInicialTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasListas")
+        self.tableView.register(CelulaListaTableViewCell.self, forCellReuseIdentifier: "celulaLista")
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else { return }
         contexto = appDelegate.persistentContainer.viewContext
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         recuperaListas()
+        contaQuantidadeDeTarefasAFazer()
     }
     
     func recuperaListas() {
@@ -66,20 +70,49 @@ class TelaInicialTableViewController: UITableViewController {
         }
     }
     
-    func removeLista(indexPath: IndexPath) {
-        guard let lista = self.listaDeListas?[indexPath.row],
-              let contexto = self.contexto
+    func contaQuantidadeDeTarefasAFazer() {
+        var contador = 0
+        
+        guard let listaDeListas = listaDeListas
         else { return }
+        
+        for lista in listaDeListas {
+            let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
+            requisicao.predicate = NSPredicate(format: "lista = %@ and checkbox = false", lista)
+            
+            do {
+                
+                guard let contexto = contexto
+                else { return }
+                
+                contador = try contexto.count(for: requisicao)
+                lista.setValue(contador, forKey: "quantidade")
+                try contexto.save()
+                tableView.reloadData()
+                
+            } catch let erro {
+                print("Erro ao salvar listas:" + erro.localizedDescription)
+            }
+        }
+    }
+    
+    func removeLista(indexPath: IndexPath){
+        guard
+            let lista = self.listaDeListas?[indexPath.row],
+            let contexto = self.contexto
+        else { return }
+        
         contexto.delete(lista)
         self.listaDeListas?.remove(at: indexPath.row)
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
         
         do {
             try contexto.save()
-        } catch let erro {
+        } catch let erro  {
             print("Erro ao remover lista:" + erro.localizedDescription)
         }
     }
+    
     
     // MARK: - Table view data source
     
@@ -92,11 +125,17 @@ class TelaInicialTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasListas", for: indexPath)
-        let dadosLista = self.listaDeListas?[indexPath.row]
+        guard
+            let celula = tableView.dequeueReusableCell(withIdentifier: "celulaLista", for: indexPath) as? CelulaListaTableViewCell,
+            let dadosLista = self.listaDeListas?[indexPath.row]
+        else { return UITableViewCell() }
         
         celula.accessoryType = .disclosureIndicator
-        celula.textLabel?.text = dadosLista?.value(forKey: "descricao") as? String
+        celula.textLabel?.text = (dadosLista.value(forKey: "descricao") as? String)
+        
+        if let valor = dadosLista.value(forKey: "quantidade") as? Int {
+            celula.detailTextLabel?.text = "\(valor)"
+        }
         
         return celula
     }
@@ -124,6 +163,7 @@ class TelaInicialTableViewController: UITableViewController {
                 self.listaSelecionada = self.listaDeListas?[indice]
                 let viewDeDestino = AdicionaListaViewController()
                 viewDeDestino.listaSelecionada = self.listaSelecionada
+                viewDeDestino.delegate = self
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
             })
         ]
@@ -132,5 +172,5 @@ class TelaInicialTableViewController: UITableViewController {
 }
 
 protocol TelaInicialTableViewControllerDelegate: AnyObject {
-    func chamaRecuperaListas()
+    func recuperaListas()
 }

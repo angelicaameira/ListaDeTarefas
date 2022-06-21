@@ -8,12 +8,9 @@
 import UIKit
 import CoreData
 
-class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaInicialTableViewControllerDelegate, UINavigationControllerDelegate {
-    func chamaRecuperaListas() {
-        //        let telaInicial: TelaInicialTableViewController
-        //        telaInicial.recuperaListas()
-    }
+class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
     
+    weak var delegate: TelaInicialTableViewControllerDelegate?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
     
@@ -70,6 +67,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else { return }
         contexto = appDelegate.persistentContainer.viewContext
+        
     }
     
     @objc func ok() {
@@ -78,8 +76,10 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         } else {
             atualizarNomeDaLista()
         }
-        self.navigationController?.dismiss(animated: true, completion: nil)
-        chamaRecuperaListas()
+        self.navigationController?.dismiss(animated: true) { [weak self]
+            in
+            self?.delegate?.recuperaListas()
+        }
     }
     
     @objc func cancelar() {

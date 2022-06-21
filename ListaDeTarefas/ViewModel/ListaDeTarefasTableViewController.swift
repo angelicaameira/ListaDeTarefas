@@ -8,11 +8,11 @@
 import UIKit
 import CoreData
 
-class ListaDeTarefasTableViewController: UITableViewController {
+class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTableViewControllerDelegate {
     
     var listaSelecionada: NSManagedObject?
     var tarefaSelecionada: NSManagedObject?
-    var contexto: NSManagedObjectContext?
+    var contexto: NSManagedObjectContext!
     var listaDeTarefas: [NSManagedObject] = []
     
     // MARK: - View code
@@ -28,6 +28,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     @objc func vaiParaAdicionarTarefa() {
         let viewDeDestino = AdicionaTarefaViewController()
         viewDeDestino.listaSelecionada = self.listaSelecionada
+        viewDeDestino.delegate = self
         self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
     }
     
@@ -41,7 +42,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "celulaMinhasTarefas")
+        self.tableView.register(CelulaTarefaTableViewCell.self, forCellReuseIdentifier: "celulaTarefa")
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else { return }
@@ -63,12 +64,15 @@ class ListaDeTarefasTableViewController: UITableViewController {
         requisicao.sortDescriptors = [ordenacao]
         
         do {
-            guard
-                let contexto = contexto,
-                let tarefasRecuperadas = try contexto.fetch(requisicao) as? [NSManagedObject]
+            
+            guard let contexto = contexto
             else { return }
-            self.listaDeTarefas = tarefasRecuperadas
+            
+            let tarefasRecuperadas = try contexto.fetch(requisicao)
+            self.listaDeTarefas = tarefasRecuperadas as! [NSManagedObject]
+            
             tableView.reloadData()
+            
         } catch let erro {
             print("Erro ao carregar tarefas:" + erro.localizedDescription)
         }
@@ -79,6 +83,7 @@ class ListaDeTarefasTableViewController: UITableViewController {
         
         guard let contexto = self.contexto
         else { return }
+        
         contexto.delete(tarefa)
         self.listaDeTarefas.remove(at: indexPath.row)
         self.tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -101,21 +106,45 @@ class ListaDeTarefasTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celula = tableView.dequeueReusableCell(withIdentifier: "celulaMinhasTarefas", for: indexPath)
-        let dadosTarefa = self.listaDeTarefas[indexPath.row]
+        guard let celula = tableView.dequeueReusableCell(withIdentifier: "celulaTarefa", for: indexPath) as? CelulaTarefaTableViewCell
+        else { return UITableViewCell() }
         
+        let dadosTarefa = self.listaDeTarefas[indexPath.row]
+        let descricao = dadosTarefa.value(forKey: "descricao") as? String
+        let detalhes = dadosTarefa.value(forKey: "detalhes") as? String
+        
+        celula.textLabel?.text = descricao
         celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
-        celula.accessoryType = .disclosureIndicator
+        celula.detailTextLabel?.text = detalhes
+        celula.detailTextLabel?.numberOfLines = 0
+        
+        guard let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
+        else { return celula }
+        
+        celula.accessoryType = checkbox ? .checkmark : .none
         
         return celula
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .disclosureIndicator {
+        self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
+        
+        guard let checkboxTarefa = self.tarefaSelecionada?.value(forKey: "checkbox") as? Bool
+        else { return }
+        
+        if checkboxTarefa == false {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            tarefaSelecionada?.setValue(true, forKey: "checkbox")
         } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .disclosureIndicator
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            tarefaSelecionada?.setValue(false, forKey: "checkbox")
+        }
+        
+        do {
+            try contexto.save()
+        } catch let erro  {
+            print("Erro ao atualizar tarefa:" + erro.localizedDescription)
         }
     }
     
@@ -135,9 +164,14 @@ class ListaDeTarefasTableViewController: UITableViewController {
                 let viewDeDestino = AdicionaTarefaViewController()
                 viewDeDestino.tarefaSelecionada = self.tarefaSelecionada
                 viewDeDestino.listaSelecionada = self.listaSelecionada
+                viewDeDestino.delegate = self
                 self.present(UINavigationController(rootViewController: viewDeDestino), animated: true)
             })
         ]
         return UISwipeActionsConfiguration(actions: acoes)
     }
+}
+
+protocol ListaDeTarefasTableViewControllerDelegate: AnyObject {
+    func recuperaTarefas()
 }

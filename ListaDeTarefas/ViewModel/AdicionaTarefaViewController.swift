@@ -10,6 +10,7 @@ import CoreData
 
 class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
     
+    weak var delegate: ListaDeTarefasTableViewControllerDelegate?
     var tarefaSelecionada: NSManagedObject?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
@@ -90,7 +91,10 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         } else {
             atualizarTarefa()
         }
-        self.navigationController?.dismiss(animated: true, completion: nil)
+        self.navigationController?.dismiss(animated: true) { [weak self]
+            in
+            self?.delegate?.recuperaTarefas()
+        }
     }
     
     @objc func cancelar() {
@@ -103,6 +107,7 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
         novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
         novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+        novaTarefa.setValue(false, forKey: "checkbox")
         novaTarefa.setValue(lista, forKey: "lista")
         
         do {
