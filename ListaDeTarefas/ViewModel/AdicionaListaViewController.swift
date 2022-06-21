@@ -8,14 +8,13 @@
 import UIKit
 import CoreData
 
-class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaInicialTableViewControllerDelegate, UINavigationControllerDelegate {
-    func chamaRecuperaListas() {
-        //        let telaInicial: TelaInicialTableViewController
-        //        telaInicial.recuperaListas()
-    }
+class AdicionaListaViewController: UIViewController, UITextFieldDelegate {
     
+    weak var delegate: TelaInicialTableViewControllerDelegate?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
+    var alertAdicionar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao adicionar uma nova lista", preferredStyle: .alert)
+    var alertEditar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao editar a lista", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -70,6 +69,7 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
         else { return }
         contexto = appDelegate.persistentContainer.viewContext
+        
     }
     
     @objc func ok() {
@@ -78,8 +78,10 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         } else {
             atualizarNomeDaLista()
         }
-        self.navigationController?.dismiss(animated: true, completion: nil)
-        chamaRecuperaListas()
+        self.navigationController?.dismiss(animated: true) { [weak self]
+            in
+            self?.delegate?.recuperaListas()
+        }
     }
     
     @objc func cancelar() {
@@ -92,7 +94,8 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         
         do {
             try contexto.save()
-        } catch let erro {
+        } catch let erro  {
+            self.alertAdicionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
             print("Erro ao salvar lista:" + erro.localizedDescription)
         }
     }
@@ -105,7 +108,8 @@ class AdicionaListaViewController: UIViewController, UITextFieldDelegate, TelaIn
         do {
             try contexto.save()
         } catch let erro {
-            print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
+                self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
+                print("Erro ao atualizar nome da lista:" + erro.localizedDescription)
         }
     }
     

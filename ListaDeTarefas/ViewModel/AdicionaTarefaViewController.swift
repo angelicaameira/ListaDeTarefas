@@ -10,9 +10,12 @@ import CoreData
 
 class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
     
+    weak var delegate: ListaDeTarefasTableViewControllerDelegate?
     var tarefaSelecionada: NSManagedObject?
     var contexto: NSManagedObjectContext!
     var listaSelecionada: NSManagedObject?
+    var alertAdicionar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao adicionar uma nova tarefa", preferredStyle: .alert)
+    var alertEditar = UIAlertController(title: "Atenção!", message: "Um erro ocorreu ao editar a tarefa", preferredStyle: .alert)
     
     // MARK: - View code
     
@@ -90,7 +93,10 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         } else {
             atualizarTarefa()
         }
-        self.navigationController?.dismiss(animated: true, completion: nil)
+        self.navigationController?.dismiss(animated: true) { [weak self]
+            in
+            self?.delegate?.recuperaTarefas()
+        }
     }
     
     @objc func cancelar() {
@@ -103,15 +109,16 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         let novaTarefa = NSEntityDescription.insertNewObject(forEntityName: "Tarefa", into: contexto)
         novaTarefa.setValue(self.campoDescricao.text, forKey: "descricao")
         novaTarefa.setValue(self.campoDetalhes.text, forKey: "detalhes")
+        novaTarefa.setValue(false, forKey: "checkbox")
         novaTarefa.setValue(lista, forKey: "lista")
         
         do {
             try contexto.save()
         } catch let erro {
-            print("Erro ao salvar tarefa:" + erro.localizedDescription)
+                self.alertAdicionar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
+                print("Erro ao salvar tarefa:" + erro.localizedDescription)
         }
     }
-    
     func atualizarTarefa() {
         guard let tarefa = self.tarefaSelecionada
         else { return }
@@ -121,7 +128,8 @@ class AdicionaTarefaViewController: UIViewController, UITextFieldDelegate {
         do {
             try contexto.save()
         } catch let erro {
-            print("Erro ao atualizar tarefa:" + erro.localizedDescription)
+                self.alertEditar.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "tente novamente"), style: .default, handler: nil))
+                print("Erro ao atualizar tarefa:" + erro.localizedDescription)
         }
     }
     

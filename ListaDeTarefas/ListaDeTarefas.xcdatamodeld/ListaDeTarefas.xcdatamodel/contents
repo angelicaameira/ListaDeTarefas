@@ -3,6 +3,7 @@
     <entity name="Lista" representedClassName="Lista" syncable="YES" codeGenerationType="class">
         <attribute name="checkbox" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="descricao" optional="YES" attributeType="String"/>
+        <attribute name="quantidade" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="tarefas" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tarefa" inverseName="lista" inverseEntity="Tarefa"/>
     </entity>
     <entity name="Tarefa" representedClassName="Tarefa" syncable="YES" codeGenerationType="class">
@@ -12,7 +13,7 @@
         <relationship name="lista" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Lista" inverseName="tarefas" inverseEntity="Lista"/>
     </entity>
     <elements>
-        <element name="Lista" positionX="-8.66796875" positionY="-102.234375" width="128" height="74"/>
+        <element name="Lista" positionX="-8.66796875" positionY="-102.234375" width="128" height="89"/>
         <element name="Tarefa" positionX="187.875" positionY="-117.25" width="128" height="89"/>
     </elements>
 </model>
