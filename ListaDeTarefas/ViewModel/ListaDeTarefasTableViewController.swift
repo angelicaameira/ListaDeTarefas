@@ -35,7 +35,7 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
     override func loadView() {
         super.loadView()
         
-        self.navigationItem.title = (listaSelecionada?.value(forKey: "descricao") as! String)
+        self.navigationItem.title = listaSelecionada?.value(forKey: "descricao") as? String
         self.navigationItem.rightBarButtonItems = [botaoAdicionarTarefa]
     }
     
@@ -44,7 +44,8 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         
         self.tableView.register(CelulaTarefaTableViewCell.self, forCellReuseIdentifier: "celulaTarefa")
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        else { return }
         contexto = appDelegate.persistentContainer.viewContext
     }
     
@@ -57,8 +58,9 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         guard let lista = listaSelecionada
         else { return }
         let requisicao = NSFetchRequest<NSFetchRequestResult>(entityName: "Tarefa")
-        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         let ordenacao = NSSortDescriptor(key: "descricao", ascending: true)
+        
+        requisicao.predicate = NSPredicate(format: "lista = %@", lista)
         requisicao.sortDescriptors = [ordenacao]
         
         do {
@@ -75,19 +77,19 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         }
     }
     
-    func removeTarefa(indexPath: IndexPath){
+    func removeTarefa(indexPath: IndexPath) {
         let tarefa = self.listaDeTarefas[indexPath.row]
         
-        if let contexto = self.contexto{
-            contexto.delete(tarefa)
-            self.listaDeTarefas.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            do {
-                try contexto.save()
-            } catch let erro  {
-                print("Erro ao remover tarefa:" + erro.localizedDescription)
-            }
+        guard let contexto = self.contexto
+        else { return }
+        contexto.delete(tarefa)
+        self.listaDeTarefas.remove(at: indexPath.row)
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        do {
+            try contexto.save()
+        } catch let erro {
+            print("Erro ao remover tarefa:" + erro.localizedDescription)
         }
     }
     
@@ -112,11 +114,12 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
         celula.detailTextLabel?.numberOfLines = 0
         let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
         
-        if checkbox == true {
-            celula.accessoryType = .checkmark
-        } else {
-            celula.accessoryType = .none
-        }
+        celula.textLabel?.text = dadosTarefa.value(forKey: "descricao") as? String
+        
+        guard let checkbox = dadosTarefa.value(forKey: "checkbox") as? Bool
+        else { return celula }
+        
+        celula.accessoryType = checkbox ? .checkmark : .none
         
         return celula
     }
@@ -124,13 +127,16 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         self.tarefaSelecionada = self.listaDeTarefas[indexPath.row]
-        guard let tarefa = self.tarefaSelecionada else { return }
-        if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCell.AccessoryType.none {
+        
+        guard let checkboxTarefa = self.tarefaSelecionada?.value(forKey: "checkbox") as? Bool
+        else { return }
+        
+        if checkboxTarefa == false {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-            tarefa.setValue(true, forKey: "checkbox")
+            tarefaSelecionada?.setValue(true, forKey: "checkbox")
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
-            tarefa.setValue(false, forKey: "checkbox")
+            tarefaSelecionada?.setValue(false, forKey: "checkbox")
         }
         
         do {
@@ -143,12 +149,14 @@ class ListaDeTarefasTableViewController: UITableViewController, ListaDeTarefasTa
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let acoes = [
             UIContextualAction(style: .destructive, title: "Apagar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 self.removeTarefa(indexPath: indexPath)
                 tableView.reloadData()
             }),
             UIContextualAction(style: .normal, title: "Editar", handler: { [weak self] (contextualAction, view, _) in
-                guard let self = self else { return }
+                guard let self = self
+                else { return }
                 let indice = indexPath.row
                 self.tarefaSelecionada = self.listaDeTarefas[indice]
                 let viewDeDestino = AdicionaTarefaViewController()
